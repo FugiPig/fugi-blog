@@ -31,7 +31,7 @@ class Node():
         self.fa_dict=fa_dict
         self.number=len(fa_dict)
         self.htmlname="node-"+str(self.number)+".html"
-        self.fa_a=fa_a+'<a class="in-button" herf="%s">%s</a>'%(self.get_url(),'-'+self.name)
+        self.fa_a=fa_a+'<a class="in-button" href="%s">%s</a>'%(self.get_url(),'-'+self.name)
         self.son_node=[]
         self.son_blog=[]
         self.add_son_node()
@@ -48,7 +48,7 @@ class Node():
     def build_html(self,html_path):
         top_index=""
         for i in self.son_node:
-            top_index+='<li class="top-button"><a herf="%s">%s</a></li>'%(i.get_url(),i.name)
+            top_index+='<li class="top-button"><a href="%s">%s</a></li>'%(i.get_url(),i.name)
             i.build_html(html_path)
             self.son_blog+=i.son_blog
         if(top_index==""):
@@ -72,17 +72,17 @@ class Node():
             print("Writing to:",filename)
             w.write(self.html_str)
 class Tree():
-    def __init__(self,root_url='',root_path='.'):
+    def __init__(self,root_url='',html_path="html",root_path='.'):
         self.root_url=root_url
         self.root_path=op.abspath(root_path)
         self.node_dict={}
-        self.root_node=Node(self.root_path,op.basename(self.root_path),self.node_dict,root_url,"")
-        self.html_path=op.abspath(root_url)
+        self.root_node=Node(self.root_path,op.basename(self.root_path),self.node_dict,root_url+'/'+html_path,"")
+        self.html_path=op.abspath(html_path)
         if not op.exists(self.html_path):
             os.mkdir(self.html_path)
         self.root_node.build_html(self.html_path)
 if __name__=="__main__":
-    tr=Tree(root_url="html",root_path="Blog")
+    tr=Tree(root_url="fugi-blog",root_path="Blog")
     if ERROR_ST==[]:
         print("Init sucessfully.")
         #TODO: build html

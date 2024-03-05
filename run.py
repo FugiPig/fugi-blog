@@ -37,8 +37,18 @@ class Blog():
             self.localnum=int(self.filename[:index+1])
         self.blogname=self.filename[index+1:]
         #print(self.filename,index,self.localnum,self.blogname)
-        self.html_str=blog.get_html(filename,self.blogname)
         self.falist=[first_fa]
+        self.fa_html=""
+        for i in self.falist:
+            if(self.fa_html==""):
+                self.fa_html+=i.fa_a
+            else:
+                self.fa_html+="("+i.fa_a+")"
+            self.fa_html+="<br>"
+        self.html_str=blog.get_html(filename,self.blogname)
+        pos=self.html_str.find("%s")
+        if pos!=-1:
+            self.html_str=self.html_str[:pos]+self.fa_html+self.html_str[pos+2:]
     def write_html(self,path):
         filename=op.join(path,self.htmlname)
         with open(filename,"w",encoding="utf-8")as w:
@@ -49,14 +59,7 @@ class Blog():
     def get_html(self,root_url):
         if root_url[-1]!='/':
             root_url+='/'
-        fa_html=""
-        for i in self.falist:
-            if(fa_html==""):
-                fa_html+=i.fa_a
-            else:
-                fa_html+="("+i.fa_a+")"
-            fa_html+="<br>"
-        return SON_BLOG_HTML%(self.localnum,fa_html,root_url+self.htmlname,self.blogname)
+        return SON_BLOG_HTML%(self.localnum,self.fa_html,root_url+self.htmlname,self.blogname)
 class Node():
     def __init__(self,path,name,fa_dict,root_url,fa_a):
         self.name=str(name)

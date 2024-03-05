@@ -42,10 +42,10 @@ a:hover,a:active
 .blog-button {
     width: auto;
     padding: 5px 10px 5px 10px;
-    background-color: aliceblue;
     overflow: auto;
-    border: outset;
-    border-width: 8px;
+    border: dashed;
+    border-color: aliceblue;
+    border-width: 4px;
     text-align: left;
     display: block;
     margin: auto;
@@ -58,5 +58,6 @@ a:hover,a:active
     display: inline;
     line-height: 60px;
     font-size: 40px;
+    color: aliceblue;
     font-family: "楷体";
 }

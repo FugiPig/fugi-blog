@@ -1,1 +1,340 @@
-<p>ZSBW</p>
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Zhang San's Blog Website</title>
+        <link rel="stylesheet" href="mystyle.css">
+    </head>
+    <body>
+        <big><h1 class="title-h">张三的博客</h1></big>
+        <hr width="300">
+        <h2 class="title-h">Zhang San's Blog</h4>
+        <h2 class="title-h">当前/Curent: 费用流简述.md</h3>
+        %s
+        <span class="blog-text"><h1>0006: 费用流简述</h1>
+<p>本篇为网络流系列第 6 篇, 关于本系列详见<a href="https://www.luogu.com.cn/blog/fugi-tech/post-0000-bo-ke-mu-lu">0000: 博客目录</a>.</p>
+<p>本文需要对最大流算法(见第0002篇)有较为详细的了解.</p>
+<h2>1. 定义</h2>
+<p>在网络$G(V,E)$上, 多一个单位流量的费用 $w(u,v)$, 对于0001篇中的例子, 可看做 , 满足$w(u,v)=-w(v,u)$(退流边，流过去再流回来费用为0). 对于流经边 $(u,v)$ 的流 $f(u,v)$ , 有代价 $w(u,v)\cdot f(u,v)$ .
+<strong>最小费用最大流</strong>, 即在最大化 $|f|$ 的情况下最小化 $\sum_{(u,v)} w(u,v)\cdot f(u,v)$ . 如果需要求解最大费用最大流, 可以将边权$\times(-1)$, 最后再$\times(-1)$.</p>
+<h2>2. SSP算法</h2>
+<h3>2.1 算法思路</h3>
+<p>SSP(Successive Shortest Path)算法是一个贪心的算法, 即在增广过程中使用$\sum w(u,v)$最小的增广路进行增广. SSP算法不适用于具有负权环的初始网络(未添加退流边的网络).</p>
+<blockquote>
+<p><strong>证明</strong></p>
+<p>我们考虑使用数学归纳法和反证法来证明 SSP 算法的正确性。</p>
+<p>设$|f|$为 $i$ 时 $\min{\sum_{(u,v)} w(u,v)\cdot f(u,v)}$ 为 $f_i$, 初始时不具有负权环, 因此有$f_0=0$. 我们在$f_i$的基础上,找到一条最短的增广路,从而求出$f_{i+1}$, 此时$f_{i+1}-f_i$即为最短增广路. 若存在更小的$f_{i+1}'$,则$f_{i+1}'-f_i\lt f_{i+1}-f_i$. 由于存在更短的增广路，说明$f_{i+1}'-f_i$所对应的最短路经过负权环(因为有负权环的最短路为$-\infin$), 而流量为 $i$ 时可以通过流经此负权环获得更小的代价,因为会从环上一点流出再流回,其总流量为 $0$.</p>
+</blockquote>
+<h3>2.2 算法流程</h3>
+<p>因此我们以$w(u,v)$为边权, 在 Ford–Fulkerson 方法中将通过 BFS 寻找增广路改为用最短路在残余网络中寻找增广路即可. </p>
+<h3>2.3 时间复杂度分析</h3>
+<p>如果使用 Bellman–Ford 算法或 SPFA 算法求解最短路(因为费用可以为负, 存在负权边), 每次找增广路的时间复杂度为$ \varTheta(nm)$. 设该网络的最大流为$ f$, 则最坏时间复杂度为$ O(nmf)$. 事实上, SSP 算法是<a href="https://oi-wiki.org/misc/cc-basic/#pseudo-polynomial-time-%E4%BC%AA%E5%A4%9A%E9%A1%B9%E5%BC%8F%E6%97%B6%E9%97%B4">伪多项式时间</a>的.</p>
+<h3>2.4 代码实现(<a href="https://www.luogu.com.cn/problem/P3381">洛谷模板题</a>)</h3>
+<h4>2.4.1 基于 Edmonds–Karp 算法</h4>
+<p>```cpp</p>
+<h1>include<iostream></h1>
+<h1>include<queue></h1>
+<h1>include<cstring></h1>
+<p>using namespace std;
+const int maxn=5e3+5,maxm=5e4+5,inf=0x3f3f3f3f;
+struct edge
+{
+    int to,cf,w,nxt;
+}ae[maxm&lt;&lt;1];
+int head[maxn],h[maxn],dis[maxn],prev_[maxn],pree[maxn],tot=1,in,im,is,it;
+bool vis[maxn];
+void add_de(int fr,int to,int c,int w)
+{
+    ae[++tot]={to,c,w,head[fr]};
+    head[fr]=tot;
+    ae[++tot]={fr,0,-w,head[to]};
+    head[to]=tot;
+}
+bool spfa()
+{
+    for(int v1=1;v1&lt;=in;v1++)
+    {
+        dis[v1]=inf;
+        vis[v1]=false;
+    }
+    queue<int> q;
+    dis[is]=0;
+    q.push(is);
+    while(!q.empty())
+    {
+        int cur=q.front();
+        q.pop();
+        vis[cur]=false;
+        for(int v1=head[cur];v1!=-1;v1=ae[v1].nxt)
+        {
+            int v=ae[v1].to,ndis=dis[cur]+ae[v1].w;
+            if(ndis<dis[v]&&ae[v1].cf)
+            {
+                dis[v]=ndis;
+                prev_[v]=cur;
+                pree[v]=v1;
+                q.push(v);
+            }
+        }
+    }
+    return dis[it]!=inf;
+}
+int main()
+{
+    memset(head,-1,sizeof(head));
+    memset(h,0x3f,sizeof(h));
+    cin>&gt;in&gt;&gt;im&gt;&gt;is&gt;&gt;it;
+    for(int v1=1;v1&lt;=im;v1++)
+    {
+        int ix,iy,ic,iw;
+        scanf("%d %d %d %d",&amp;ix,&amp;iy,&amp;ic,&amp;iw);
+        add_de(ix,iy,ic,iw);
+    }
+    int ansf=0,ansc=0;
+    while(spfa())
+    {
+        int minf=inf;
+        for(int v1=it;v1!=is;v1=prev_[v1])minf=min(minf,ae[pree[v1]].cf);
+        for(int v1=it;v1!=is;v1=prev_[v1])
+        {
+            ae[pree[v1]].cf-=minf;
+            ae[pree[v1]^1].cf+=minf;
+        }
+        ansf+=minf;
+        ansc+=minf*dis[it];
+    }
+    cout&lt;&lt;ansf&lt;&lt;' '&lt;&lt;ansc&lt;&lt;endl;
+    return 0;
+}
+```</p>
+<h4>2.4.2 基于 Dinic 算法</h4>
+<p>```cpp</p>
+<h1>include<iostream></h1>
+<h1>include<cstring></h1>
+<h1>include<queue></h1>
+<p>using namespace std;
+const int maxn=5e3+5,maxm=5e4+5,inf=0x3f3f3f3f;
+typedef long long ll;
+struct edge
+{
+    int to,cf,w,nxt;
+}ae[maxm&lt;&lt;1];
+int head[maxn],curhead[maxn],dis[maxn],vis[maxn],vis_dfs[maxn],tot=1,in,im,s,t;
+int ansf=0,ansc=0;
+struct node
+{
+    int pos,cdis;
+    friend bool operator&lt;(node a,node b)
+    {
+        return a.cdis&gt;b.cdis;
+    }
+};
+void add_de(int fr,int to,int c,int w)
+{
+    ae[++tot]={to,c,w,head[fr]};
+    head[fr]=tot;
+    ae[++tot]={fr,0,-w,head[to]};
+    head[to]=tot;
+}
+bool spfa()
+{
+    queue<int> q;
+    for(int v1=1;v1&lt;=in;v1++)dis[v1]=inf;
+    dis[s]=0;
+    vis[s]=true;
+    q.push(s);
+    while(!q.empty())
+    {
+        int cur=q.front();
+        q.pop();
+        vis[cur]=false;
+        for(int v1=head[cur];v1!=-1;v1=ae[v1].nxt)
+        {
+            int curson=ae[v1].to,ndis=dis[cur]+ae[v1].w;
+            if(ndis<dis[curson]&&ae[v1].cf)
+            {
+                dis[curson]=ndis;
+                if(!vis[curson])q.push(curson);
+                vis[curson]=true;
+            }
+        } 
+    }
+    return dis[t]!=inf;
+}
+int dfs(int cur,int flow)
+{
+    if(!flow||cur==t)return flow;
+    vis_dfs[cur]=true;
+    int res=0;
+    for(int &v1=curhead[cur];v1!=-1;v1=ae[v1].nxt)
+    {
+        int curson=ae[v1].to;
+        if(!ae[v1].cf||vis_dfs[curson]||ae[v1].w+dis[cur]!=dis[curson])continue;
+        ll k=dfs(curson,min(ae[v1].cf,flow-res));
+        ae[v1].cf-=k;
+        ae[v1^1].cf+=k;
+        ansc+=k*ae[v1].w;
+        res+=k;
+        if(res==flow)break;
+    }
+    vis_dfs[cur]=false;
+    return res;
+}
+int main()
+{
+    memset(head,-1,sizeof(head));
+    cin>&gt;in&gt;&gt;im&gt;&gt;s&gt;&gt;t;
+    for(int v1=1;v1&lt;=im;v1++)
+    {
+        int ix,iy,ic,iw;
+        scanf("%d %d %d %d",&amp;ix,&amp;iy,&amp;ic,&amp;iw);
+        add_de(ix,iy,ic,iw);
+    }
+    while(spfa())
+    {
+        for(int v1=1;v1&lt;=in;v1++)curhead[v1]=head[v1];
+        int flow=dfs(s,inf);
+        ansf+=flow;
+    }
+    cout&lt;&lt;ansf&lt;&lt;' '&lt;&lt;ansc&lt;&lt;endl;
+    return 0;
+}
+```</p>
+<h2>3. Primal-Dual 原始对偶算法</h2>
+<h3>3.1算法思路</h3>
+<p>由于 SPFA 算法在图上效率劣于 Dijkstra 算法, 但 Dijkstra 算法不适用于网络这样的负权图, 所以需要将边权处理为正数. 我们可以使用类似于 Johnson 多源最短路算法的处理.</p>
+<h3>3.2 算法流程</h3>
+<ol>
+<li>先使用如 SPFA 这样支持负权的单源最短路算法, 以 $w$ 为边权求出各点到原点 $s$ 的最短路, 记为点权 $h_i$ .</li>
+<li>定义新边权 $w(u,v)'=w(u,v)-h_v+h_u$ :
+   $$\begin{matrix}
+   \because h_u+w(u,v) \ge h_v\
+   \therefore w(u,v)-h_v+h_u \ge 0\\therefore\text{可使用 dijkstra 算法求解最短路}\end{matrix}$$
+   以此边权从源点出发求解最短路, 设 $i$ 点的最短路为 $dis_i$ .对于 $s\to i$ 的最短路上点 $p\notin {s,i}$ , 其入边的 $-h_p$ 与其出边的 $h_p$ 抵消, 所以 $dis_i=\sum_{(u,v)\text{在}s\to i\text{最短路上}}w(u,v)+h_s-h_i$. 对于汇点, $h_s-h_t$是一个定值, 所以新边权下$s\to t$最短路与原图$s\to t$最短路相同.</li>
+<li>对最短路进行增广, 对在$s\to t$最短路上的$f(u,v)$增加$\min_{(u,v)\text{在}s\to i\text{最短路上}}c_f(u,v)$.</li>
+<li>因为增广后图的形态会发生改变, 因此需要对$h_i$进行更新.  设更新后的$h_i$为$h_i'$, 则有:</li>
+</ol>
+<p>$$h_i'=dis_i+h_i\=\sum_{(u,v)\text{在}s\to i\text{最短路上}}w(u,v)+h_s-h_i+h_i\=\sum_{(u,v)\text{在}s\to i\text{最短路上}}w(u,v) (h_s\text{恒为0})\\therefore h_i'\ge0(\text{第2步处证明})$$</p>
+<ol>
+<li>重复$2\to 4$步, 直到 $s$ 与 $t$ 不联通.</li>
+</ol>
+<h3>3.3 时间复杂度分析</h3>
+<p>如果使用堆优化的 Dijkstra 算法求解最短路, 每次找增广路的时间复杂度为$ \varTheta(m\log_2m)$. 设该网络的最大流为$ f$, 则最坏时间复杂度为$ O(fm\log _2m)$. </p>
+<h3>3.4 代码实现(<a href="https://www.luogu.com.cn/problem/P3381">洛谷模板题</a>)</h3>
+<p>```cpp</p>
+<h1>include<iostream></h1>
+<h1>include<queue></h1>
+<h1>include<cstring></h1>
+<p>using namespace std;
+const int maxn=5e3+5,maxm=5e4+5,inf=0x3f3f3f3f;
+struct edge
+{
+    int to,cf,w,nxt;
+}ae[maxm&lt;&lt;1];
+int head[maxn],h[maxn],dis[maxn],prev_[maxn],pree[maxn],tot=1,in,im,is,it;
+bool vis[maxn];
+void add_de(int fr,int to,int c,int w)
+{
+    ae[++tot]={to,c,w,head[fr]};
+    head[fr]=tot;
+    ae[++tot]={fr,0,-w,head[to]};
+    head[to]=tot;
+}
+struct node
+{
+    int id,cdis;
+    friend bool operator&lt;(node a,node b)
+    {
+        return a.cdis&gt;b.cdis;
+    }
+};
+bool dijkstra()
+{
+    for(int v1=1;v1&lt;=in;v1++)
+    {
+        dis[v1]=inf;
+        vis[v1]=false;
+    }
+    priority_queue<node> pq;
+    dis[is]=0;
+    pq.push({is,0});
+    while(!pq.empty())
+    {
+        int cur=pq.top().id;
+        pq.pop();
+        if(vis[cur])continue;
+        vis[cur]=true;
+        for(int v1=head[cur];v1!=-1;v1=ae[v1].nxt)
+        {
+            int v=ae[v1].to,ndis=dis[cur]+ae[v1].w-h[v]+h[cur];
+            if(ndis<dis[v]&&ae[v1].cf)
+            {
+                dis[v]=ndis;
+                prev_[v]=cur;
+                pree[v]=v1;
+                pq.push({v,ndis});
+            }
+        }
+    }
+    return dis[it]!=inf;
+}
+int main()
+{
+    memset(head,-1,sizeof(head));
+    memset(h,0x3f,sizeof(h));
+    cin>&gt;in&gt;&gt;im&gt;&gt;is&gt;&gt;it;
+    for(int v1=1;v1&lt;=im;v1++)
+    {
+        int ix,iy,ic,iw;
+        scanf("%d %d %d %d",&amp;ix,&amp;iy,&amp;ic,&amp;iw);
+        add_de(ix,iy,ic,iw);
+    }
+    //SPFA
+    queue<int> q;
+    vis[is]=true;
+    h[is]=0;
+    q.push(is);
+    while(!q.empty())
+    {
+        int cur=q.front();
+        q.pop();
+        vis[cur]=false;
+        for(int v1=head[cur];v1!=-1;v1=ae[v1].nxt)
+        {
+            int v=ae[v1].to,ndis=ae[v1].w+h[cur];
+            if(h[v]&lt;ndis||!ae[v1].cf)continue;
+            dis[v]=ndis;
+            if(!vis[v])q.push(v);
+            vis[v]=true;
+        }
+    }
+    int ansf=0,ansc=0;
+    while(dijkstra())
+    {
+        for(int v1=1;v1&lt;=in;v1++)h[v1]+=dis[v1];
+        int minf=inf;
+        for(int v1=it;v1!=is;v1=prev_[v1])minf=min(minf,ae[pree[v1]].cf);
+        for(int v1=it;v1!=is;v1=prev_[v1])
+        {
+            ae[pree[v1]].cf-=minf;
+            ae[pree[v1]^1].cf+=minf;
+        }
+        ansf+=minf;
+        ansc+=minf*h[it];
+    }
+    cout&lt;&lt;ansf&lt;&lt;' '&lt;&lt;ansc&lt;&lt;endl;
+    return 0;
+}
+```</p>
+<h2>4. 参考资料</h2>
+<p><a href="https://oi-wiki.org/graph/flow/min-cost/">最小费用最大流-OI wiki</a></p>
+<p><a href="https://oi-wiki.org/graph/flow/min-cost/">最大流-OI wiki</a></p>
+<h2>5. 练习题目</h2>
+<ol>
+<li><a href="https://www.luogu.com.cn/problem/P3381">P3381 【模板】最小费用最大流</a></li>
+<li><a href="https://www.luogu.com.cn/problem/P4015">P4015 运输问题</a></li>
+<li><a href="https://www.luogu.com.cn/problem/P3705">P3705 [SDOI2017] 新生舞会</a>(需要0003篇分数规划相关知识)</li>
+</ol></span>
+    </body>
+</html>

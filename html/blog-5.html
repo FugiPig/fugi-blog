@@ -1,1 +1,125 @@
-<p>ZSBW</p>
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Zhang San's Blog Website</title>
+        <link rel="stylesheet" href="mystyle.css">
+    </head>
+    <body>
+        <big><h1 class="title-h">张三的博客</h1></big>
+        <hr width="300">
+        <h2 class="title-h">Zhang San's Blog</h4>
+        <h2 class="title-h">当前/Curent: 网络流定义与基本性质简述.md</h3>
+        %s
+        <span class="blog-text"><h1>0001: 网络流定义与基本性质简述</h1>
+<p>本篇为网络流系列的第 1 篇, 关于本系列详见<a href="https://www.luogu.com.cn/blog/fugi-tech/post-0000-bo-ke-mu-lu">0000: 博客目录</a>.</p>
+<h2>1. 定义</h2>
+<p><img alt="0001-1" src="https://cdn.luogu.com.cn/upload/image_hosting/unpurlij.png" /></p>
+<p>定义 <strong>流网络(flow network)</strong> (简称网络)为一个有向图$G=(V,E)$, 其点集为$V$, 边集为$E$. 对于点对 $( u,v)$ 均有一容量$c(u,v)\ge 0$. 若$\langle u,v\rangle\notin E$, 则$c(u,v)=0$. 比如上图0001-1就是一个典型的网络, 边上的数字就是该边的容量. 我们可以对这个网络举一个具象的例子, 比如将网络具象成一个数据传输网络, 网络上的点可以具象成基站, 而有向边就是连接两个基站的单向光纤, 其容量就是光纤每秒最多可以传播的数据流量.</p>
+<p>网络中有两个特殊点: 源点($s$)和汇点($t$). 继续上面的例子, 源点(图0001-1中为点1)可以具象为数据的发送端, 而汇点(图0001-1中为点8)可以具象为数据的接受端, 其它点则为中间基站.</p>
+<p>为了方便起见, 本文在函数的求和上, 采用<strong>隐含求和记号</strong>: 其中任何一个自变量可以是一个点集, 对该集合的所有元素作为自变量的情况求和. 例如：$f(X,Y)=\sum_{u\in X}\sum_{v\in Y}f(u,v)$</p>
+<p>我们继续定义网络$G$的 <strong>流(flow)</strong> 是一个实值函数$f:V\times V\rightarrow R$, 规定其满足以下三个性质:</p>
+<ol>
+<li>
+<p><strong>容量限制</strong>: 对于$\forall u,v\in V$,有$f(u,v)\le c(u,v)$.</p>
+</li>
+<li>
+<p><strong>反对称性</strong>: 对于$\forall u,v\in V$,有$f(u,v)=-f(v,u)$, 即从 $u$ 到 $v$ 流过去$f(u,v)$相当于从 $v$ 到 $u$ 流回来$-f(u,v)$.</p>
+</li>
+<li>
+<p><strong>流守恒性</strong>:对于$\forall u\in V-{s,t}$, 有$f(V,u)=f(u,V)$, 即非源非汇点流入等于流出. 由于反对称性, 有$f(V,u)=-f(u,V)$, 所以此性质也等价于$f(V,u)=f(u,V)=0$.</p>
+</li>
+</ol>
+<p>对于边$\langle u,v\rangle$, 我们称$f(u,v)$为$u$到$v$的流. 在上面的例子中, $f(u,v)$就代表着每条边实际的数据流量. </p>
+<p>流值函数$f$的值定义为$|f|=f(s,V)=f(V,t)$,即源点的总流出值或汇点的总流入值. 一个网络中流值最大的流称为 <strong>最大流(maximum flow)</strong>. 最大流问题是网络流中最基本的问题, 我们会在0002篇中详细讲述. 在上面的例子中, 最大流问题就代表着每秒从发送端到接受端最多发送的数据流量.</p>
+<p>对于网络$G=(V,E)$, 若${S,T}$是$V$的划分(即$S\cup T=V$且$S\cap T=\varnothing$), 且满足$s\in S,t\in T$, 则称${S,T}$是$G$的一个$s-t$<strong>割(cut)</strong>, 定义其容量为$||S,T||=c(S,T)$. 特别的, 我们定义容量最小的$s-t$割为<strong>最小割</strong>.</p>
+<p>对于网络$G$及$G$上的流$f$, 我们定义点对$( u,v)$的 <strong>剩余容量(Residual Capacity)</strong> $c_f(u,v)=c(u,v)-f(u,v)$, 即还可以增加的流量. 我们将$G$中所有节点和剩余容量大于$0$的边构成的子图称为 <strong>残量网络(Residual Network)</strong> $G_f$, 形式化定义为:$G_f=(V,E_f),E_f={\langle u,v\rangle|c_f(u,v)&gt;0}$, 但因为可能有$f(u,v)&lt;0$, 所以边$\langle u,v\rangle\in E_f$的同时可能出现$\langle u,v\rangle\notin E$.</p>
+<p>我们将$G_f$上一条从源点$s$到汇点$t$的路径称为<strong>增广路(Augmenting Path)</strong>(不是图匹配中的增广路). 对于一条增广路$p$，我们给每一条边$\langle u,v\rangle\in p$都加上等量的流量$\Delta f(p)=\min{{c_f(u,v)|\langle u,v\rangle\in p}}$，并通过对其反边 $\langle v,u\rangle$ 增加 $-\Delta f(p)$ 的容量以保证反对称性, 从而令整个网络的流量增加(详见引理1.3对此的正确性证明)，这一过程被称为<strong>增广(Augment)</strong>. 由此，最大流的求解可以被视为若干次增广分别得到的流的叠加.</p>
+<h2>引理1.1: 流的基本运算</h2>
+<p>对于网络$G=(E,V)$的流$f$, 有:</p>
+<ol>
+<li>对于$\forall X\subseteq V$,有$f(X,X)=0$.</li>
+<li>对于$\forall X,Y\subseteq V$,有$f(X,Y)=-f(Y,X)$.</li>
+<li>对于$\forall X,Y,Z\subseteq V$且$X\cap Y=\varnothing$,有$f(X\cup Y,Z)=f(X,Z)+f(Y,Z)$.<blockquote>
+<p><strong>证明</strong>
+只需将拆开求和记号再结合流的三个基本性质即可证明.</p>
+</blockquote>
+</li>
+</ol>
+<h2>引理1.2: 残量网络与原网络的关系</h2>
+<p>设$f$是网络$G=(V,E)$中的一个流, $f'$是其残量网络$G_f$中的一个流, 则$f+f'$仍是$G$的一个流.</p>
+<blockquote>
+<p><strong>证明</strong>
+证明思路是分别证明流的三个性质, 如下:</p>
+<p>容量限制: 对于边$\langle u,v\rangle$, 有:
+$$\begin{aligned}&amp;\because c_f(u,v)=c(u,v)-f(u,v)\&amp;\therefore f(u,v)+f'(u,v)\le f(u,v)+c_f(u,v)=c(u,v)\end{aligned}$$</p>
+<p>反对称性: 对于边$\langle u,v\rangle$, 有:
+$$\begin{aligned}&amp;\because f(u,v)=-f(v,u), f'(u,v)=-f'(v,u)\&amp;\therefore f(u,v)+f'(u,v)=-f(v,u)-f'(v,u)=-(f(v,u)+f'(v,u))\end{aligned}$$</p>
+<p>流守恒性: 对于点 $\forall u\in V-{s,t}$, 有:
+$$\begin{aligned}&amp;\because f(u,V)=f(V,u)=0, f'(u,V)=f'(V,u)=0\&amp;\therefore f(u,V)+f'(u,V)=f(V,u)+f'(V,u)=0\end{aligned}$$</p>
+<p>得证.</p>
+</blockquote>
+<h2>引理1.3: 增广路径可增广性</h2>
+<p>对于增广路$p$,定义流$f_p$为:</p>
+<p>$$f_p(u,v)=\begin{cases}\Delta f(p) &amp; \langle u,v\rangle\in p\-\Delta f(p) &amp; \langle v,u\rangle\in p\0 &amp; else\end{cases}$$</p>
+<p>给定$G=(V,E)$和流$f$,则$f+f_p$仍是$G$上的一个流.</p>
+<blockquote>
+<p><strong>证明</strong></p>
+<p>我们首先通过分别证明流的三个性质证明$f_p$是$G_f$上的一个流, 从而通过引理1.2完成证明.</p>
+<p>对容量限制的证明:</p>
+<ol>
+<li>
+<p>对于$\langle u,v\rangle\in p$, 有$f_p(u,v)=\Delta f(p)=\min{{c_f(x,y)|\langle x,y\rangle\in p}}\le c_f(u,v)$</p>
+</li>
+<li>
+<p>对于$\langle v,u\rangle\in p$, 有$f_p(u,v)=-\Delta f(p)\le0\le c_f(u,v)$    $(\Delta f(p)\ge 0)$</p>
+</li>
+</ol>
+<p>对流量守恒的证明:</p>
+<ol>
+<li>
+<p>对于点$u$不在$p$上, 增广对其无影响.</p>
+</li>
+<li>
+<p>对于点$u$在$p$上且$u\notin {s,t}$, 设增广后的流为$f'$, 有一条增广的入边, 且有一条增广的出边, 所以有$f'(V,u)=f(V,u)+\Delta f(p)-\Delta f(p)=0$.</p>
+</li>
+</ol>
+<p>综上, $f_p$在$G_f$满足容量限制和流量守恒, 而其满足反对称性也是显而易见的.</p>
+<p>因为$f_p$是残余网络$G_f$上的一个流,根据引理1.2, 得证.</p>
+</blockquote>
+<h2>引理1.4: 割与流的关系</h2>
+<p>在网络$G=(V,E)$中, 设任意一个流为$f$,${S,T}$是$G$的一个$s-t$割, 则通过割的净流$f(S,T)=|f|$.</p>
+<blockquote>
+<p><strong>证明</strong></p>
+<p>$$\begin{aligned}f(S,T)&amp;=f(S,V)-f(S,S)&amp;\text{(引理1.1.3)}\&amp;=f(S,V)&amp;\text{(引理1.1.1)}\&amp;=f(s,V)+f(S-{s},V)&amp;\text{(引理1.1.3)}\&amp;=f(s,V)&amp;\text{(流守恒性,f(S-{s},V)=0)}\&amp;=|f|\end{aligned}$$</p>
+</blockquote>
+<h2>推论1.5: 对偶问题的性质</h2>
+<p>在网络$G=(V,E)$中, 设任意一个流为$f$,${S,T}$是$G$的一个$s-t$割, 则割的容量$||S,T||\ge|f|$.</p>
+<p>推论1.5反映了网络的最大流必定不超过此网络最小割的容量. 实际上, 最小割问题是最大流的<strong>对偶问题</strong>(duality), 而对偶问题都具有类似推论1.5的性质.</p>
+<blockquote>
+<p><strong>证明</strong></p>
+<p>根据引理1.4和容量限制,有:$||S,T||=c(S,T)\ge f(S,T)=|f|$.</p>
+</blockquote>
+<h2>定理1.6: 最大流最小割定理</h2>
+<p>若$f$是网络$G=(V,E)$的一个流, 则下列条件等价:</p>
+<ol>
+<li>$f$是$G$的一个最大流.</li>
+<li>残留网络$G_f$不包含增广路径.</li>
+<li>对$G$的某个割${S,T}$, 有$|f|=||S,T||$</li>
+</ol>
+<p>最大流最小割定理说明了最大流的值与最小割的容量相等, 即$\max{|f|}=\min{||S,T||}$, 因为对于最大流, 推论1.5可以取等, 即为最小割.</p>
+<blockquote>
+<p><strong>证明</strong></p>
+<p>$1.6.1\implies1.6.2$: 反证法, 设$f$是$G$的一个最大流, 但残余网络$G_f$包含增广路$p$. 由引理1.3, 流的和$f+f_p$仍为$G$的流, 且$|f+f_p|&gt;|f|$,矛盾.</p>
+<p>$1.6.2\implies1.6.3$: 残留网络$G_f$不包含增广路, 即$G_f$中不存在源点到汇点的路径. 构造性的令: $S={v\in V|\exists p_{s,v}\in G_f}$, 其中$ \exists p_{s,v}\in G_f$表示在$G_f$中存在一条源点到$v$的通路, 且$T=V-S$ . 则划分${S,T}$是一个割: $s\in S$, 由于$G_f$中不存在源点到汇点的路径,所以$t\notin S$. 对于$\forall u\in S,\forall v\in T$, 有$f(u,v)=c(u,v)$, 否则$\exists \langle u,v\rangle\in E_f$, $v$点就属于$S$. 由引理1.4, 得$|f|=f(S,T)=||S,T||$.</p>
+<p>$1.6.3\implies1.6.1$: 由推论1.5得, 对于所有割${S,T}$, 都有$|f|\le||S,T||$, 因此$|f|=||S,T||$说明$f$是一个最大流.</p>
+</blockquote>
+<h2>2. 参考资料</h2>
+<ul>
+<li>《最小割模型在信息学竞赛中的应用》——胡伯涛</li>
+<li><a href="https://oi-wiki.org/graph/flow/">网络流简介</a> ——OI Wiki</li>
+<li><a href="https://oi-wiki.org/graph/flow/max-flow/">最大流 </a> ——OI Wiki</li>
+</ul></span>
+    </body>
+</html>

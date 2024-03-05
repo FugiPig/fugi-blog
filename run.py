@@ -1,12 +1,13 @@
 import os.path as op
 import os
+import blog
 ERROR_ST=[]
 SON_BLOG_HTML="""
 <li>
     <div class="blog-button">
-        <h2 class="in-button">%d</h2>
+        <h3 class="in-button">%d</h2>
         <h2 style="display:inline;">%s</h2>
-        <h3 class="in-button"><a href="%s">%s</a></h3>
+        <h4 class="in-button"><a href="%s">%s</a></h3>
     </div>
 </li>"""
 INDEX_HTML='<a style="display: inline;" href="%s">%s</a>'
@@ -14,7 +15,6 @@ TOP_HTML='<li class="top-button"><a href="%s">%s</a></li>'
 BLOG_CNT=0
 with open("template.html","r",encoding="utf-8") as r:
     PAGE_HTML=r.read()
-print(PAGE_HTML)
 class Blog():
     def __init__(self,filename,fa_dict,first_fa):
         global BLOG_CNT
@@ -37,7 +37,7 @@ class Blog():
             self.localnum=int(self.filename[:index+1])
         self.blogname=self.filename[index+1:]
         #print(self.filename,index,self.localnum,self.blogname)
-        self.html_str="<p>ZSBW</p>"
+        self.html_str=blog.get_html(filename,self.blogname)
         self.falist=[first_fa]
     def write_html(self,path):
         filename=op.join(path,self.htmlname)

@@ -12,7 +12,7 @@ body {
 a {
     font-family:"宋体";
     color:white;
-    display: block;
+    display: inline;
     padding: 2px 2px;
     text-decoration: none;
     line-height: 60px;
@@ -57,7 +57,10 @@ a:hover,a:active
     margin: 0px;
     display: inline;
     line-height: 60px;
-    font-size: 40px;
+    font-size: 30px;
     color: aliceblue;
     font-family: "楷体";
+}
+.blog-text {
+    color:aliceblue;
 }

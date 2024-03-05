@@ -31,14 +31,12 @@ class Node():
         self.fa_dict=fa_dict
         self.number=len(fa_dict)
         self.htmlname="node-"+str(self.number)+".html"
-        self.fa_a=fa_a+'<a class="in-button" href="%s">%s</a>'%(self.get_url(),'-'+self.name)
+        self.fa_a=fa_a+'<a style="display: inline;" href="%s">%s</a>'%(root_url+'/'+self.htmlname,'-'+self.name)
         self.son_node=[]
         self.son_blog=[]
         self.add_son_node()
         self.html_str="<p>ZSBW</p>"
         #print(self.number,self.name,self.path,self.son_node,self.fa_a)
-    def get_url(self):
-        return self.root_url+'/'+self.htmlname
     def add_son_node(self):
         for i in os.listdir(self.path):
             son_path=op.join(self.path,i)
@@ -48,7 +46,7 @@ class Node():
     def build_html(self,html_path):
         top_index=""
         for i in self.son_node:
-            top_index+='<li class="top-button"><a href="%s">%s</a></li>'%(i.get_url(),i.name)
+            top_index+='<li class="top-button"><a href="%s">%s</a></li>'%(self.root_url+'/'+i.htmlname,i.name)
             i.build_html(html_path)
             self.son_blog+=i.son_blog
         if(top_index==""):
@@ -64,7 +62,7 @@ class Node():
             son_blog+=i.get_html()
         if son_blog=="":
             son_blog='<h2 class="title-h">No child blog.</h2>'
-        self.html_str=PAGE_HTML%(top_index,son_blog)
+        self.html_str=PAGE_HTML%(top_index,self.fa_a,son_blog)
         self.write_html(html_path)
     def write_html(self,path):
         filename=op.join(path,self.htmlname)

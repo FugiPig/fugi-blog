@@ -1,0 +1,77 @@
+body {
+    background-color:#701B7E;
+}
+.title-h {
+    color:white;
+    text-align:center;
+    padding-top: 0px;
+    padding-bottom: 0px;
+    margin-top: 0px;
+    margin-bottom: 10px;
+}
+a {
+    font-family:"宋体";
+    color:white;
+    display: inline;
+    padding: 2px 2px;
+    text-decoration: none;
+    line-height: 60px;
+}
+ul
+{
+	list-style-type:none;
+	margin:0;
+	padding:0;
+	overflow:hidden;
+}
+li.top-button
+{
+	float:left;
+    margin: 0px;
+    height: auto;
+    width: auto;
+    padding: 10px 30px;
+    text-align: center;
+    vertical-align: middle;
+    font-size: 30px;
+}
+a:hover,a:active
+{
+    color:black;
+}
+.blog-button {
+    width: auto;
+    padding: 5px 10px 5px 10px;
+    overflow: auto;
+    border: dashed;
+    border-color: aliceblue;
+    border-width: 4px;
+    text-align: left;
+    display: block;
+    margin: auto;
+    margin-left: 50px;
+    margin-right: 50px;
+    margin-bottom: 30px;
+}
+.in-button {
+    margin: 0px;
+    display: inline;
+    line-height: 60px;
+    font-size: 30px;
+    color: aliceblue;
+    font-family: "楷体";
+}
+div a {
+    color:#701B7E;
+    font-size: 130%;
+}
+.blog-text {
+    color:#701B7E;
+    font-family: "宋体";
+    font-size: 20px;
+    width: 800px;
+    padding: 2% 5%;
+    margin: auto;
+    font-size: 150%;
+    background-color:aliceblue;
+}
